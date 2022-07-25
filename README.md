@@ -1,5 +1,5 @@
-# postmarket_samsung_a72q
-PostmarketOS for Samsung Galaxy A72
+# postmarket_samsung_a52q
+postmarketOS for Samsung Galaxy A52
 
 ## Works
 - USB Gadget mode

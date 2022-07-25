@@ -1,0 +1,83 @@
+# Reference: <https://postmarketos.org/devicepkg>
+pkgname=device-samsung-a52q
+pkgdesc="Samsung Galaxy A52"
+pkgver=2.1
+pkgrel=0
+url="https://postmarketos.org"
+license="MIT"
+arch="aarch64"
+options="!check !archcheck"
+depends="
+	linux-postmarketos-qcom-sm7125
+	mesa-dri-gallium
+	mkbootimg
+	postmarketos-base
+"
+makedepends="devicepkg-dev"
+source="
+	deviceinfo
+	30-gpu-firmware.files
+	GalaxyA52.conf
+	HiFi.conf
+"
+
+subpackages="
+	$pkgname-nonfree-firmware:nonfree_firmware
+	$pkgname-mainline-firmware:mainline_firmware
+	$pkgname-alsa:alsa
+"
+
+build() {
+	devicepkg_build $startdir $pkgname
+}
+
+package() {
+	devicepkg_package $startdir $pkgname
+}
+
+mainline_firmware() {
+	pkgdesc="Firmware support packages for mainline kernel"
+	depends="firmware-samsung-a52q-adreno"
+	install_if="linux-postmarketos-qcom-sm7125 $pkgname-nonfree-firmware"
+	mkdir "$subpkgdir"
+
+	install -Dm644 "$srcdir/30-gpu-firmware.files" \
+		"$subpkgdir/etc/postmarketos-mkinitfs/files/30-gpu-firmware.files"
+}
+
+nonfree_firmware() {
+	pkgdesc="Firmware for GPU, Audio, Modem, WiFi, etc."
+	depends="
+		firmware-samsung-a52q-adreno
+		firmware-samsung-a52q-adsp
+		firmware-samsung-a52q-cdsp
+		firmware-samsung-a52q-ipa
+		firmware-samsung-a52q-modem
+		firmware-samsung-a52q-wlan
+		firmware-samsung-a52q-bluetooth
+		firmware-samsung-a52q-venus
+		msm-modem
+		msm-modem-uim-selection
+		pd-mapper
+		tqftpserv
+		"
+	install="$subpkgname.post-install"
+	mkdir "$subpkgdir"
+}
+
+alsa() {
+	pkgdesc="Audio configuration files"
+	depends="alsa-ucm-conf"
+	install_if="linux-postmarketos-qcom-sm7125 $pkgname-nonfree-firmware"
+	mkdir "$subpkgdir"
+	
+	install -Dm644 "$srcdir/GalaxyA52.conf" "$subpkgdir/usr/share/alsa/ucm2/conf.d/sm8250/Galaxy A52.conf"
+	install -Dm644 "$srcdir/HiFi.conf" "$subpkgdir/usr/share/alsa/ucm2/Samsung/a52q/HiFi.conf"
+}
+
+sha512sums="
+c3a5ae0183402b99dd8317429085526db9de3189d986185f6b9df2a9732b3a8a86c3f1a391c5688b584988cc6e8c9c5a1ac5a3981bc4c7953feaf98e91e96a7b  deviceinfo
+2d05313b813a5434901ec3920d2b0c8040621676cb2c041ca4de2e67913cb3ea642b66363c80f9d1fc7b2bdd7d770f897433c75ad32f392c0917a7cbcde7e850  30-gpu-firmware.files
+98ebd0a980059b0571ddff3cb6bf61211f1c3969dc77c6623c0e46519affa7bace67904ebafb96b8e13d178659228461c355f19ad04aa0c588665f6883596c68  GalaxyA52.conf
+1cc56056899d85da276028b4a114a5360db392c5bfabe0a47ba927411a8a1466ff8cb36bfe52356db0ce297f741f49cd0bb49b6c6d46583a21f155f36bccf344  HiFi.conf
+"
